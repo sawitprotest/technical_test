@@ -1,0 +1,270 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: User Service
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:8080
+paths:
+  /registration:
+    post:
+      summary: Endpoint for user registration.
+      operationId: registration
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+      responses:
+        '200':
+          description: User registration success
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ResponseSuccessUserRegistrationResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        '409':
+          description: Status conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        '422':
+          description: Server error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /login:
+    post:
+      summary: Endpoint for user login.
+      operationId: login
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: User login success
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ResponseSuccessUserLoginResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        '422':
+          description: Server error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /profile/{id}:
+    get:
+      summary: Endpoint for get user profile.
+      operationId: Get user profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: the user identifier, as userId
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Get profile success
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ResponseSuccessGetUserProfileResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        '422':
+          description: Server error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+                
+    put:
+      summary: Endpoint for update user profile.
+      operationId: Update user profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: the user identifier, as userId
+          schema:
+            type: string
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Update profile success
+          content:
+            application/json:    
+              schema:
+                $ref: "#/components/schemas/ResponseSuccess"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        '409':
+          description: Status conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        '422':
+          description: Server error occurred
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+
+components:
+  schemas:
+    UserRegistrationRequest:
+      type: object
+      required:
+        - phone_number
+        - full_name
+        - password
+      properties:
+        phone_number:
+          type: string
+        full_name:
+          type: string
+        password:
+          type: string
+    UserRegistrationResponse:
+      type: object
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: integer
+          format: int32
+    ResponseSuccessUserRegistrationResponse:
+      allOf:
+      - $ref: '#/components/schemas/ResponseSuccess'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/UserRegistrationResponse'
+
+    UserLoginRequest:
+      type: object
+      required:
+        - phone_number
+        - password
+      properties:
+        phone_number:
+          type: string
+        password:
+          type: string
+    UserLoginResponse:
+      type: object
+      required:
+        - user_id
+        - token
+        - expired_at
+      properties:
+        user_id:
+          type: integer
+          format: int32
+        token:
+          type: string
+        expired_at:
+          type: string
+    ResponseSuccessUserLoginResponse:
+      allOf:
+      - $ref: '#/components/schemas/ResponseSuccess'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/UserLoginResponse'
+
+    GetUserProfileResponse:
+      type: object
+      required:
+        - phone_number
+        - full_name
+      properties:
+        phone_number:
+          type: string
+        full_name:
+          type: string
+    ResponseSuccessGetUserProfileResponse:
+      allOf:
+      - $ref: '#/components/schemas/ResponseSuccess'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/GetUserProfileResponse'
+
+    UpdateProfileRequest:
+      type: object
+      required:
+        - phone_number
+        - full_name
+      properties:
+        phone_number:
+          type: string
+        full_name:
+          type: string
+
+    ResponseSuccess:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+
+    ErrorMessage:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
