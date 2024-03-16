@@ -4,7 +4,7 @@
 
 all: build/main
 
-build/main: cmd/main.go generated
+build/main: main.go generated
 	@echo "Building..."
 	go build -o $@ $<
 
